@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandora × BigQuery 簡報講稿與專有名詞解析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06080f;
+  --surface: #0c1220;
+  --card: #111b30;
+  --line: #1e2e50;
+  --blue: #8ab4f8;
+  --pink: #ec4899;
+  --green: #34a853;
+  --orange: #f59e0b;
+  --text: #f1f5f9;
+  --muted: #8ba0bd;
+  --dim: #50627d;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Noto Sans TC", sans-serif;
+  line-height: 1.6;
+  padding: 40px 20px;
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+}
+@media (max-width: 900px) {
+  .container { grid-template-columns: 1fr; }
+}
+h1 { font-size: 32px; margin-bottom: 20px; color: #fff; }
+h2 { font-size: 24px; margin-top: 40px; margin-bottom: 16px; color: var(--blue); border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+h3 { font-size: 20px; margin-top: 24px; margin-bottom: 12px; color: #fff; }
+p { font-size: 16px; color: var(--muted); margin-bottom: 16px; }
+ul { margin-left: 24px; margin-bottom: 16px; color: var(--muted); }
+li { margin-bottom: 8px; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.slide-num {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(138, 180, 248, 0.15);
+  color: var(--blue);
+  border-radius: 999px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+.glossary-term {
+  color: var(--pink);
+  font-weight: bold;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  font-family: "JetBrains Mono", "Noto Sans TC", monospace;
+}
+.highlight { color: #fff; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 左側：講稿區 -->
+  <div class="script-section">
+    <h1>🎙️ Pandora × BigQuery 簡報講稿</h1>
+    <p>這是一份為 Google 分享會準備的參考講稿，您可以根據現場節奏與個人風格進行微調。</p>
+
+    <div class="card">
+      <div class="slide-num">Slide 01: Cover</div>
+      <p>大家好，我是來自 Accucrazy 的 [您的名字]。今天很高興能來到 Google，和大家分享我們公司旗下的 AI 產品 <strong>Pandora</strong>，為什麼在評估了眾多資料庫後，最終選擇了 <strong>Google BigQuery</strong> 作為我們的核心資料底座。今天我會著重在工程實踐的真實心得，包含 Text-to-SQL、向量搜尋以及 Serverless 架構帶來的價值。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 02: The Big Idea</div>
+      <p>在進入技術細節前，我想先拋出一個我們團隊的核心觀點：<strong>「AI 時代真正的競爭力，其實發生在資料處理能力。」</strong></p>
+      <p>現在大家都在追求更強的模型、更漂亮的對話介面，但如果底層資料是混亂的、查詢是緩慢的，AI 最後只會變成一個「講話很順的客服機器人」，無法提供真實的商業洞察。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 03-04: Company & Clients</div>
+      <p>簡單介紹一下 Accucrazy，我們是一間專注於 AI 技術應用的公司（可帶過 Timeline 重點）。這是我們目前服務的客戶牆，涵蓋了零售、FMCG、美妝等多個領域，他們都依賴我們的系統來進行市場決策。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 05: Pandora 是什麼</div>
+      <p>回到我們的主力產品 Pandora。它是一個「社群聲量 AI 系統」。簡單來說，品牌客戶可以直接用自然語言問它：「幫我分析全家福袋近 14 天的負面討論」。</p>
+      <p>為了回答這句話，系統背後必須同時做三件重活：掃描千萬筆文章的<strong>全文搜尋</strong>、比對語意相似度的<strong>向量搜尋</strong>，以及最後將兩者完美融合的 <strong>RRF 排序</strong>。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 06: 資料特性</div>
+      <p>我們面對的資料不是一般的交易紀錄，而是社群上的真實留言（Dcard、PTT、Threads 等）。這些資料有幾個痛點：第一，<strong>很長</strong>，單篇可能高達兩千字；第二，<strong>很多</strong>，動輒上千萬筆；第三，<strong>極難預測</strong>，因為是 LLM 動態生成 SQL，我們無法提前建好完美的 Index；第四，<strong>語意複雜</strong>，很多時候消費者抱怨價格，不會直接寫「價格」兩個字。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 07: Real World Challenge (全家)</div>
+      <p>舉個最經典的例子：台灣最難監測的品牌「全家」。</p>
+      <p>如果你只用傳統關鍵字，系統會抓回一堆「週末帶全家出去玩」這種雜訊。更慘的是台灣社群特有的「反串」，像是「這咖啡我還不喝爆」其實是正面，但「阿你不就好棒棒」其實是負面。傳統 NLP 看到「好棒棒」會加分，直接翻車。所以我們必須依賴 <strong>Fine-tuned LLM（微調過的大型語言模型）</strong> 來精準判斷語境。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 08: 第一件事 Text-to-SQL</div>
+      <p>為了解決這些問題，我們做的第一件事是 Text-to-SQL。讓 LLM 把自然語言轉成 SQL 語法去查 BigQuery。</p>
+      <p>為什麼 BigQuery 撐得住這種暴力的動態查詢？因為它的 <strong>Dremel 架構</strong>可以把查詢分散到無數個節點平行處理，加上 <strong>Capacitor 欄列式儲存</strong>，查內容時只讀內容欄位，不用把整筆資料拉出來。這對我們這種 Ad-hoc（即興）查詢非常友善。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 09: 第二件事 VECTOR_SEARCH</div>
+      <p>第二件事是向量搜尋。用來解決前面提到「語意相近但字眼不同」的問題。</p>
+      <p>BigQuery 最棒的地方是它<strong>原生支援 VECTOR_SEARCH</strong>。我們不需要把向量資料搬到另一個獨立的向量資料庫（像是 Pinecone 或 Milvus），而是可以直接在 BigQuery 裡面，把向量分數跟文章的平台、時間、情緒標籤 <strong>JOIN 在一起</strong>。架構瞬間變得超級乾淨。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 10: 第三件事 RRF Hybrid Search</div>
+      <p>第三件事是 RRF 混合搜尋。我們會同時發出關鍵字查詢跟向量查詢，然後用 RRF 公式把兩邊的排名融合。</p>
+      <p>因為兩條 Query 都是打給同一個 BigQuery，我們只要在應用層用 Promise.all 平行發送，回來再做輕量的 Merge 就好，不需要跨資料庫同步狀態。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 11 & 14: 為什麼不用 PostgreSQL</div>
+      <p>很多人會問，為什麼不用 PostgreSQL 加 pgvector？</p>
+      <p>PostgreSQL 是很棒的資料庫，如果是做訂單系統我一定選它。但它是 Row-store（列式儲存），面對千萬筆長文的全表掃描，I/O 壓力會非常可怕。加上要維護 pgvector 的 HNSW 索引、處理 Vacuum 等等，對我們小團隊來說，運維成本太高了。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 12: BigQuery 五大優勢</div>
+      <p>總結來說，BigQuery 對 Pandora 有五個決定性的優勢：Serverless 免維運、Capacitor 欄列儲存、原生向量搜尋、可以直接在 BQ 內呼叫 AI 產出 Embedding、以及連續查詢能力。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 13: 真實場景 (猛健樂)</div>
+      <p>這是一個真實的運作流水線。當使用者問「猛健樂副作用」，LLM 抽關鍵字 -> BQ 關鍵字搜尋 -> BQ 向量搜尋找「胃不舒服」的語意 -> RRF 融合。整個過程在千萬筆資料中，只要 10 到 20 秒就能給出高價值的洞察。</p>
+    </div>
+
+    <div class="card">
+      <div class="slide-num">Slide 15-16: Takeaways & Closing</div>
+      <p>最後，Pandora 從 BigQuery 得到的最大價值是什麼？是<strong>「時間」</strong>。</p>
+      <p>因為 Serverless 架構吃掉了所有維運的麻煩，我們小團隊不需要養 DBA，我們可以把所有的精力花在「讓 AI 更懂社群語言」、「幫客戶提早發現公關危機」上。</p>
+      <p>在 AI 時代，資料庫選型就是產品戰略。BigQuery 讓我們能穩穩地接住 AI 的潛力。謝謝大家！</p>
+    </div>
+  </div>
+
+  <!-- 右側：專有名詞解析區 -->
+  <div class="glossary-section">
+    <h1>📚 專有名詞解析</h1>
+    <p>簡報中出現的技術名詞白話文解釋，幫助您在 Q&A 時能輕鬆應對。</p>
+
+    <div class="card">
+      <div class="glossary-term">Text-to-SQL</div>
+      <p><strong>白話文：</strong>讓 AI 把「人類講的話」翻譯成「資料庫看得懂的程式碼 (SQL)」。</p>
+      <p><strong>情境：</strong>客戶不懂寫程式，只會打字問「全家最近有什麼負評？」，AI 會自動把它翻譯成 `SELECT * FROM posts WHERE ...` 去資料庫撈資料。</p>
+
+      <div class="glossary-term">VECTOR_SEARCH (向量搜尋)</div>
+      <p><strong>白話文：</strong>不比對「字面」，而是比對「意思」。</p>
+      <p><strong>情境：</strong>傳統搜尋找「副作用」，文章裡必須剛好有這三個字才找得到。向量搜尋會把文字變成數學座標，發現「胃不舒服」、「想吐」在數學空間上離「副作用」很近，就能把它們一起找出來。</p>
+
+      <div class="glossary-term">RRF (Reciprocal Rank Fusion)</div>
+      <p><strong>白話文：</strong>一種公平的「混合計分法」。</p>
+      <p><strong>情境：</strong>我們同時用「關鍵字」和「向量」找文章。A 文章在關鍵字排第 1、向量排第 10；B 文章在關鍵字排第 3、向量排第 2。RRF 就是一套數學公式，把這兩邊的名次融合，選出「兩邊都覺得不錯」的最佳結果。</p>
+
+      <div class="glossary-term">Serverless (無伺服器)</div>
+      <p><strong>白話文：</strong>不用自己買機器、管主機，用多少算多少。</p>
+      <p><strong>情境：</strong>以前要養工程師 (DBA) 每天盯著資料庫怕當機。用 BigQuery Serverless，Google 會幫你管好底層機器，就算突然有一萬人同時查詢，Google 也會瞬間調動資源幫你算完，你只要付查詢的錢就好。</p>
+
+      <div class="glossary-term">Columnar Storage (欄列式儲存 / Capacitor)</div>
+      <p><strong>白話文：</strong>資料庫讀取資料的方式。傳統是一列一列讀（像看 Excel 讀整橫排），BigQuery 是一欄一欄讀（直著讀）。</p>
+      <p><strong>情境：</strong>當我們只要分析「文章內容」這一欄時，BigQuery 不會去讀取作者、時間、按讚數等其他欄位，大幅減少讀取的時間和成本。這對我們這種每篇文章都很長（2000字）的情境非常省力。</p>
+
+      <div class="glossary-term">Dremel 架構</div>
+      <p><strong>白話文：</strong>Google 內部的超級分工系統。</p>
+      <p><strong>情境：</strong>當你下達一個查詢，Dremel 會瞬間把這個任務切成幾千幾萬個小碎塊，丟給 Google 機房裡無數台機器同時算，算完再拼起來給你，所以幾 TB 的資料也能在幾秒內算完。</p>
+
+      <div class="glossary-term">Fine-tuned LLM (微調大型語言模型)</div>
+      <p><strong>白話文：</strong>給聰明的 AI 上「專業補習班」。</p>
+      <p><strong>情境：</strong>原本的 ChatGPT 雖然聰明，但可能不懂台灣的 PTT 鄉民用語。我們餵給它大量的台灣社群語料進行「微調訓練」，讓它學會看懂「阿你不就好棒棒」其實是在酸人（負面），而不是在稱讚（正面）。</p>
+
+      <div class="glossary-term">pgvector / HNSW</div>
+      <p><strong>白話文：</strong>PostgreSQL 資料庫用來做向量搜尋的外掛工具與演算法。</p>
+      <p><strong>情境：</strong>業界很多人用這個方案，但當資料量大到千萬筆時，維護這個外掛的索引（HNSW）會變得非常吃資源，需要專業的工程師去調校參數，所以我們選擇直接用 BigQuery 內建的功能來避開這個麻煩。</p>
+      <div class="glossary-term">Promise.all (平行處理)</div>
+      <p><strong>白話文：</strong>讓程式「同時」派發多個任務，然後等大家一起回來，而不是排隊一個一個做。</p>
+      <p><strong>情境：</strong>我們同時向 BigQuery 發出「關鍵字搜尋」和「向量搜尋」。如果關鍵字要 2 秒，向量要 3 秒，用 Promise.all 總共只要 3 秒（取最慢的那個），而不是 2+3=5 秒。這讓系統能以最快速度把兩邊的結果拿回來融合。</p>
+
+      <div class="glossary-term">RRF 公式中的 k 值 (平滑常數)</div>
+      <p><strong>白話文：</strong>一個用來「防作弊」的緩衝數字（業界通常設定為 60），避免某一種搜尋方式過度霸佔排名。</p>
+      <p><strong>情境：</strong>公式是 <code>1 / (k + 名次)</code>。如果沒有 k，第 1 名得分是 1/1=1，第 2 名是 1/2=0.5，分數掉太快了！加上 k=60 後，第 1 名是 1/61，第 2 名是 1/62，分數差距變小。這樣做的好處是：只有在「關鍵字」跟「向量」兩邊都拿到不錯名次（例如兩邊都前 20 名）的文章，加總起來的分數才會最高，藉此真正選出「兩邊都認可」的最佳結果。</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
